@@ -1,0 +1,82 @@
+1. Creating HBase table -clicks with column family hits:
+
+	create 'clicks', 'hits'
+
+
+2. Now load the data into table clicks using put command
+
+While loading use IPaddress as row key.
+
+	put 'clicks', 'IPaddress : 8.8.8.8', 'hits', 'www.google.com'
+
+	put 'clicks', 'IPaddress : 209.191.56.123', 'hits', 'www.yahoo.com'
+
+	put 'clicks', 'IPaddress : 209.191.80.42', 'hits:hits_1', '100'
+
+	put 'clicks', 'IPaddress : 10.10.10.10', 'hits', 'www.gmail.com'
+
+	put 'clicks', 'IPaddress : 123.125.78.190', 'hits', 'www.abc.com'
+
+	put 'clicks', 'IPaddress : 123.125.78.190', 'hits_2', '80'
+
+
+Now view the loaded data. Use scan command to view the whole table
+
+hbase(main):014:0> scan 'clicks'
+ROW                              COLUM+CELL                                                                                 
+ IPaddress : 10.10.10.10         column=hits:, timestamp=1500818624986,value=www.gmail.com                                  
+ IPaddress : 10.10.10.10.        column=hits:no_of_hits, timestamp=1500821784454,value=80                                   
+ IPaddress : 123.125.78.190      column=hits:, timestamp=1500818633843,value=www.abc.com                                    
+ IPaddress : 209.191.56.123      column=hits:, timestamp=1500819775705,value=www.xyz.com                                    
+ IPaddress : 209.191.80.42       column=hits:no_of_hits, timestamp=1500821751452,value=100                                  
+ IPaddress : 8.8.8.8             column=hits:, timestamp=1500819761588,value=www.linkedin.com                               
+
+6 row(s) in 0.6320 seconds
+
+Updating some the records :  Update the values of first two records
+
+	put 'clicks', 'IPaddress : 8.8.8.8', 'hits', 'www.linkedin.com'
+
+	put 'clicks', 'IPaddress : 209.191.56.123', 'hits', 'www.xyz.com'
+
+
+hbase(main):020:0> scan 'clicks'
+
+hbase(main):020:0> scan 'clicks'
+ROW                              COLUM+CELL
+                                                                                 
+ IPaddress : 10.10.10.10         column=hits:, timestamp=1500818624986,value=www.gmail.com                                  
+ IPaddress : 123.125.78.190      column=hits:, timestamp=1500818633843,value=www.abc.com                                    
+ IPaddress : 209.191.56.123      column=hits:, timestamp=1500819775705,value=www.xyz.com   
+ IPaddress : 10.10.10.10.        column=hits:no_of_hits, timestamp=1500821784454,value=80                                
+ IPaddress : 8.8.8.8             column=hits:, timestamp=1500819761588,value=www.linkedin.com  
+ IPaddress : 209.191.80.42       column=hits:no_of_hits, timestamp=1500821751452,value=100                                  
+                             
+6 row(s) in 0.1630 seconds
+
+
+So we can see the we have modified the first two records.
+
+
+Now delete few records:
+
+Before deleting first we need t disable the table.
+
+delete 'clicks', 'IPaddress : 10.10.10.10'
+
+
+scan 'cliccks'
+
+hbase(main):036:0> scan 'clicks'
+ROW                              COLUMN+CELL                                                                                 
+ IPaddress : 10.10.10.10.        column=hits:no_of_hits, timestamp=1500821784454, value=80                                   
+ IPaddress : 123.125.78.190      column=hits:, timestamp=1500818633843, value=www.abc.com                                    
+ IPaddress : 209.191.56.123      column=hits:, timestamp=1500819775705, value=www.xyz.com                                    
+ IPaddress : 209.191.80.42       column=hits:no_of_hits, timestamp=1500821751452, value=100                                  
+ IPaddress : 8.8.8.8             column=hits:, timestamp=1500819761588, value=www.linkedin.com                               
+5 row(s) in 0.3060 seconds
+
+clearly the entry has been deleted
+
+
+
